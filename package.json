@@ -1,0 +1,59 @@
+{
+  "name": "@danrabydev/match",
+  "version": "0.1.0",
+  "description": "Rust-style tagged unions and exhaustive match for TypeScript",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+  },
+  "keywords": [
+    "typescript",
+    "match",
+    "tagged-union",
+    "discriminated-union",
+    "enum",
+    "pattern-matching",
+    "exhaustive"
+  ],
+  "author": "Dan Raby / danrabydev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://origin.cursor.com/git/danrabydev/match.git"
+  },
+  "homepage": "https://origin.cursor.com/git/danrabydev/match",
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.33.3",
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "tsdown": "^0.22.14",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}
