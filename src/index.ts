@@ -42,6 +42,22 @@ export function match<T extends { tag: string }, R>(
 
 type VariantCtor = (...args: never[]) => object;
 
+function bindVariantCtor<K extends string, F extends VariantCtor>(
+  key: K,
+  ctor: F,
+): (...args: Parameters<F>) => ReturnType<F> & { tag: K } {
+  return (...args: Parameters<F>) => {
+    const payload = { ...ctor(...(args as never[])) };
+    Object.defineProperty(payload, "tag", {
+      value: key,
+      enumerable: true,
+      writable: false,
+      configurable: false,
+    });
+    return payload as ReturnType<F> & { tag: K };
+  };
+}
+
 type ReservedVariantName =
   | "match"
   | "_tags"
@@ -126,18 +142,7 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
       enumerable: true,
       configurable: true,
       writable: true,
-      value: ((...args: never[]) => {
-        const payload = { ...ctor(...args) };
-        // Lock last so a payload `tag` cannot forge the discriminant,
-        // and later assignment cannot reroute `match`.
-        Object.defineProperty(payload, "tag", {
-          value: key,
-          enumerable: true,
-          writable: false,
-          configurable: false,
-        });
-        return payload;
-      }) as any,
+      value: bindVariantCtor(key as keyof Defs & string, ctor),
     });
   }
 
