@@ -27,8 +27,9 @@
     "dev": "tsdown --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:dist": "node scripts/test-dist.mjs",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm test:dist",
     "prepublishOnly": "pnpm check"
   },
   "keywords": [

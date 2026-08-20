@@ -4,18 +4,11 @@ Priority order. Lower ID is higher priority.
 
 | ID | Priority | Item |
 | --- | --- | --- |
-| TD-07 | Medium | Test the published `dist/` artifact |
 | TD-08 | Low | Drop `unrun` on Node 22.18+ |
 | TD-09 | Low | Point `repository` / `homepage` at the public host |
 | TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-11 | Low | Document payload-spread semantics |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
-
-## TD-07 — Test the published `dist/` artifact
-
-Vitest imports `src/`, not `dist/`. Dual-package ESM/CJS output was smoke-tested by hand.
-
-**Suggested fix:** A post-build smoke test that `import`s `dist/index.js` and `require`s `dist/index.cjs`.
 
 ## TD-08 — Drop `unrun` on Node 22.18+
 
@@ -56,4 +49,5 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | TD-03 | Reject reserved variant names at the type level | Literal reserved keys make `createMatchable` a type error. Dynamic/`Record<string, …>` keys still throw at runtime (`__proto__`). |
 | TD-04 | Remove `as any` from constructor assignment | `bindVariantCtor` types each constructor; loop no longer uses `as any`. |
 | TD-05 | Derive `_tags` from installed constructors | `_tags` records keys that received a constructor; `undefined` holes are omitted. |
+| TD-07 | Test the published `dist/` artifact | `scripts/test-dist.mjs` imports ESM and requires CJS after `pnpm build`; wired into `check` and CI. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |

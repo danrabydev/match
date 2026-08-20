@@ -57,3 +57,6 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Smoke-test published dist
+        run: pnpm test:dist
