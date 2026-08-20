@@ -1,0 +1,27 @@
+---
+description: Dependency and release update playbook. Use when the user or a scheduled task asks to update deps, check TypeScript/Node/tsdown/vitest versions, apply security patches, or document upcoming releases.
+globs:
+  - package.json
+  - pnpm-lock.yaml
+  - tsconfig.json
+  - tsdown.config.ts
+  - docs/UPDATE-SCHEDULE.md
+  - docs/RELEASES-UPCOMING.md
+alwaysApply: false
+---
+
+# Cursor: dep-update
+
+When this task is set, **open and follow** `.grok/skills/dep-update/SKILL.md` as the source of truth (same playbook Grok uses).
+
+You must:
+
+1. Look up **current** published versions (npm, GitHub releases, `pnpm outdated`, `pnpm audit`).
+2. Look up **upcoming** versions (TypeScript roadmap, Node LTS calendar, tsdown/vitest milestones, dist-tags `next`/`rc`/`beta`).
+3. **Update code** for current due bumps and for announced deprecations (migrate ahead).
+4. **Document** near-future trains in `docs/RELEASES-UPCOMING.md` (windows, sources, impact, status, run log).
+5. Run `pnpm typecheck && pnpm test && pnpm build` after any bump.
+
+Policy: `docs/UPDATE-SCHEDULE.md`. Lookup URLs: `.grok/skills/dep-update/references/lookup.md`. Cadence: `.grok/skills/dep-update/references/cadence.md`.
+
+Do not chase nightlies. Do not auto-merge majors. Do not add runtime dependencies to `@danrabydev/match`.

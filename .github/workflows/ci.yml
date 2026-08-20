@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly glance slot from docs/UPDATE-SCHEDULE.md
+    - cron: "17 8 * * 1"
 
 permissions:
   contents: read
@@ -14,9 +17,15 @@ concurrency:
 
 jobs:
   check:
-    name: typecheck, test, build
+    name: typecheck, test, build (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22 = Maintenance LTS (oldest we run). 24 = Active LTS.
+        # Drop 22 only at EOL (2027-04-30). Add 26 after it becomes Active LTS.
+        node: [22, 24]
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,11 +40,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Audit high/critical advisories
+        run: pnpm audit --audit-level=high
 
       - name: Typecheck
         run: pnpm typecheck
