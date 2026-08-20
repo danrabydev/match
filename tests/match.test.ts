@@ -30,6 +30,22 @@ describe("createMatchable constructors", () => {
   it("exposes enumerable variant keys on _tags", () => {
     expect(Status._tags).toEqual(["Idle", "Loading", "Success", "Error"]);
   });
+
+  it("omits undefined constructor holes from _tags", () => {
+    const Holes = createMatchable({
+      Idle: () => ({}),
+      Loading: undefined,
+      Done: () => ({}),
+    } as unknown as {
+      Idle: () => object;
+      Loading: () => object;
+      Done: () => object;
+    });
+    expect(Holes._tags).toEqual(["Idle", "Done"]);
+    expect(Holes.Loading).toBeUndefined();
+    expect(Holes.Idle()).toEqual({ tag: "Idle" });
+    expect(Holes.Done()).toEqual({ tag: "Done" });
+  });
 });
 
 describe("exhaustive match", () => {
