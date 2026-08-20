@@ -9,18 +9,33 @@ export type MatchArms<T extends { tag: string }, R> = {
   [K in T["tag"]]: (value: Extract<T, { tag: K }>) => R;
 };
 
+const RESERVED_VARIANT_NAMES = new Set([
+  "match",
+  "_tags",
+  "__proto__",
+  "prototype",
+  "constructor",
+]);
+
 /**
  * Exhaustively match on a `{ tag }` discriminated union.
  *
- * @throws {Error} if `value.tag` has no corresponding arm
+ * Only own, callable arms are used — inherited `Object.prototype`
+ * properties cannot satisfy a missing arm.
+ *
+ * @throws {Error} if `value.tag` has no corresponding own arm
  */
 export function match<T extends { tag: string }, R>(
   value: T,
   arms: MatchArms<T, R>,
 ): R {
-  const arm = arms[value.tag as T["tag"]];
-  if (arm === undefined) {
-    throw new Error(`unhandled variant: ${String(value.tag)}`);
+  const tag = value.tag;
+  if (!Object.hasOwn(arms, tag)) {
+    throw new Error(`unhandled variant: ${String(tag)}`);
+  }
+  const arm = arms[tag as T["tag"]];
+  if (typeof arm !== "function") {
+    throw new Error(`unhandled variant: ${String(tag)}`);
   }
   return (arm as (payload: T) => R)(value);
 }
@@ -30,9 +45,13 @@ type VariantCtor = (...args: never[]) => object;
 /**
  * Build a tagged-union namespace from payload constructors.
  *
- * Each key becomes a constructor that returns `{ tag: key, ...payload }`.
- * The returned object also has `match` (exhaustive) and `_tags` (enumerable
- * variant names), which is useful for serialization, codegen, and UI.
+ * Each key becomes a constructor that returns `{ ...payload, tag: key }`.
+ * The library-assigned `tag` is written last so payload fields cannot
+ * forge the discriminant. The returned object also has `match`
+ * (exhaustive) and `_tags` (enumerable variant names).
+ *
+ * Variant names `match`, `_tags`, `__proto__`, `prototype`, and
+ * `constructor` are reserved and throw at creation time.
  *
  * @example
  * ```ts
@@ -61,19 +80,27 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
   };
   type Union = Variants[keyof Variants];
 
-  const constructors = {} as {
+  const constructors = Object.create(null) as {
     [K in keyof Defs]: (
       ...args: Parameters<Defs[K]>
     ) => ReturnType<Defs[K]> & { tag: K & string };
   };
 
   for (const key of Object.keys(defs) as (keyof Defs)[]) {
+    if (RESERVED_VARIANT_NAMES.has(key as string)) {
+      throw new Error(`reserved variant name: ${String(key)}`);
+    }
     const ctor = defs[key];
     if (ctor === undefined) continue;
-    constructors[key] = ((...args: never[]) => ({
-      tag: key,
-      ...ctor(...args),
-    })) as any;
+    Object.defineProperty(constructors, key, {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: ((...args: never[]) => ({
+        ...ctor(...args),
+        tag: key,
+      })) as any,
+    });
   }
 
   return {
@@ -93,6 +120,8 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
  * type Status = MatchableOf<typeof Status>;
  * ```
  */
-export type MatchableOf<T> = T extends { match: (value: infer V, arms: never) => unknown }
+export type MatchableOf<T> = T extends {
+  match: (value: infer V, arms: never) => unknown;
+}
   ? V
   : never;

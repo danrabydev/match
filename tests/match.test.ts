@@ -84,6 +84,79 @@ describe("arms can throw", () => {
   });
 });
 
+describe("discriminant integrity", () => {
+  it("does not let payload overwrite the constructor tag", () => {
+    const Forged = createMatchable({
+      Guest: (body: { tag?: string; name: string }) => body,
+    });
+    expect(Forged.Guest({ tag: "Admin", name: "ada" })).toEqual({
+      tag: "Guest",
+      name: "ada",
+    });
+    expect(
+      Forged.match(Forged.Guest({ tag: "Admin", name: "ada" }), {
+        Guest: ({ name }) => name,
+      }),
+    ).toBe("ada");
+  });
+});
+
+describe("reserved variant names", () => {
+  it("rejects match and _tags as variant names", () => {
+    expect(() =>
+      createMatchable({
+        match: () => ({}),
+      }),
+    ).toThrowError("reserved variant name: match");
+    expect(() =>
+      createMatchable({
+        _tags: () => ({}),
+      }),
+    ).toThrowError("reserved variant name: _tags");
+  });
+
+  it("rejects prototype-polluting variant names", () => {
+    const protoDefs = Object.create(null) as Record<string, () => object>;
+    protoDefs.__proto__ = () => ({});
+    expect(() => createMatchable(protoDefs)).toThrowError(
+      "reserved variant name: __proto__",
+    );
+    expect(() =>
+      createMatchable({
+        constructor: () => ({}),
+      }),
+    ).toThrowError("reserved variant name: constructor");
+  });
+});
+
+describe("prototype-safe arm lookup", () => {
+  it("does not dispatch through inherited Object.prototype arms", () => {
+    const original = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      "Loading",
+    );
+    Object.defineProperty(Object.prototype, "Loading", {
+      configurable: true,
+      value: () => "polluted",
+    });
+    try {
+      expect(() =>
+        match(Status.Loading("x"), {
+          Idle: () => "waiting",
+          Success: () => "ok",
+          Error: () => "err",
+        } as never),
+      ).toThrowError("unhandled variant: Loading");
+    } finally {
+      if (original === undefined) {
+        Reflect.deleteProperty(Object.prototype, "Loading");
+      } else {
+        Object.defineProperty(Object.prototype, "Loading", original);
+      }
+    }
+  });
+});
+
 describe("type-level exhaustiveness", () => {
   it("infers the tagged union from MatchableOf", () => {
     expectTypeOf<Status>().toMatchTypeOf<

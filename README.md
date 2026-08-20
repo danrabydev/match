@@ -45,9 +45,11 @@ Takes a map of variant name → payload constructor. Returns:
 - **`match(value, arms)`** — exhaustive matcher bound to this union
 - **`_tags`** — `string[]` of variant names, in definition order
 
+`tag` is always the constructor name, even if the payload also has a `tag` field. Names `match`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved.
+
 ### `match(value, arms)`
 
-Standalone exhaustive matcher for any `{ tag: string }` union. Same runtime behavior as the bound `match` on a matchable namespace.
+Standalone exhaustive matcher for any `{ tag: string }` union. Same runtime behavior as the bound `match` on a matchable namespace. Only own, callable arms are considered — a missing arm is never taken from `Object.prototype`.
 
 ### `MatchableOf<T>`
 
