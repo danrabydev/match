@@ -6,8 +6,7 @@
     "lib": ["ES2022"],
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
+    "declaration": false,
     "sourceMap": true,
     "noEmit": true,
     "isolatedModules": true,
@@ -15,5 +14,5 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests", "examples"]
 }
