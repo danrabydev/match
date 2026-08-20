@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly glance slot from docs/UPDATE-SCHEDULE.md
+    - cron: "17 8 * * 1"
 
 permissions:
   contents: read
@@ -42,6 +45,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Audit high/critical advisories
+        run: pnpm audit --audit-level=high
 
       - name: Typecheck
         run: pnpm typecheck
