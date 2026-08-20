@@ -16,6 +16,8 @@ and replace the rows below. Do not leave this file with an old “Last checked�
 | tsdown | 0.22.14 | 0.22.14 | `rc` 0.23.0-rc.0; `beta` 0.23.0-beta.3 | Already latest stable. Document 0.23. |
 | vitest | 4.1.11 | 4.1.11 | `rc` 5.0.0-rc.2; `beta` 5.0.0-beta.7 | Already latest 4.x. Advisories GHSA-g8mr-85jm-7xhm / GHSA-5xrq-8626-4rwp / GHSA-2h32-95rg-cppp fixed in 4.1.8+. Document 5.0. |
 | @types/node | 26.2.0 | 26.2.0 | `latest` 26.2.0 | Current. Pin stays on latest; source does not use Node APIs. |
+| publint | 0.3.24 | 0.3.24 | `latest` 0.3.24 | Added for TD-10. |
+| @arethetypeswrong/cli | 0.18.5 | 0.18.5 | `latest` 0.18.5 | Added for TD-10. |
 | pnpm | 10.33.3 (`packageManager`) | 11.22.0 (major) | — | Do not auto-merge major. |
 | Node (CI / local) | CI 22 + 24 (22.18+ for native TS stripping) | Active LTS **24** (Krypton); Maintenance LTS **22** (Jod); Current **26** | — | TD-08: dropped `unrun`. Do not drop 22 until EOL. |
 
@@ -44,6 +46,7 @@ GitHub Advisory DB checked for typescript / tsdown / vitest high/critical: no op
 | --- | --- | --- | --- |
 | Node CI matrix | 22 + 24 | 2026-08-20 | Keep Maintenance LTS 22; add soaked Active LTS 24. |
 | Drop unrun (TD-08) | no direct `unrun` dep | 2026-08-20 | Dev Node 22.18+; published target `es2022`. |
+| Package lint (TD-10) | publint 0.3.24 + attw 0.18.5 | 2026-08-20 | `lint:package` + `publish:npm --provenance`. |
 | dep-update kit | skill + rule + schedule | 2026-08-20 | Playbook installed; this file is the first live lookup. |
 
 ## Run log
@@ -54,3 +57,4 @@ GitHub Advisory DB checked for typescript / tsdown / vitest high/critical: no op
 | 2026-08-20 | Cursor / Grok (dep-update) | CI Node 22 → matrix 22+24. No package version bumps (typescript 6.0.3 kept; tsdown 0.22.14 / vitest 4.1.11 / @types/node 26.2.0 already latest stable). Advisories: none on installed graph. | TypeScript 7.0 (shipped, deferred) + 7.1 (2026-11-10); Node 26 LTS 2026-10-28; Node 24 Maintenance 2026-10-20; tsdown 0.23-rc; vitest 5.0-rc; pnpm 11 | typecheck **pass**; test **pass** (12); build **pass**; exports vs `dist/` **pass**. TS 7.0.2 trial: typecheck/test/build pass, reverted (tsdown experimental-API warning). |
 | 2026-08-20 | Cursor review follow-up | CI: add weekly schedule + `pnpm audit --audit-level=high` to match UPDATE-SCHEDULE Automation. | — | Bugbot: no bugs. Security: no medium+ findings; audit step added. |
 | 2026-08-20 | Cursor / Grok (TD-08) | Removed `unrun` direct dep. | Dev Node 22.18+; published target `es2022`. | typecheck / test / build / `test:dist`. |
+| 2026-08-20 | Cursor / Grok (TD-10) | Added publint 0.3.24 + @arethetypeswrong/cli 0.18.5. | Package export lint + npm provenance publish script. | `pnpm check` **pass** (attw all green). |

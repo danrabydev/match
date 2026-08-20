@@ -28,9 +28,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:dist": "node scripts/test-dist.mjs",
+    "lint:package": "publint && attw --pack .",
     "typecheck": "tsc --noEmit",
-    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm test:dist",
-    "prepublishOnly": "pnpm check"
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm test:dist && pnpm lint:package",
+    "prepublishOnly": "pnpm check",
+    "publish:npm": "npm publish --access public --provenance"
   },
   "keywords": [
     "typescript",
@@ -53,7 +55,9 @@
   },
   "packageManager": "pnpm@10.33.3",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@types/node": "^26.2.0",
+    "publint": "^0.3.24",
     "tsdown": "^0.22.14",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11"
