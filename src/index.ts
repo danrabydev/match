@@ -42,6 +42,23 @@ export function match<T extends { tag: string }, R>(
 
 type VariantCtor = (...args: never[]) => object;
 
+type ReservedVariantName =
+  | "match"
+  | "_tags"
+  | "__proto__"
+  | "prototype"
+  | "constructor";
+
+type KnownReservedVariantKeys<D> = string extends keyof D
+  ? never
+  : Extract<keyof D, ReservedVariantName>;
+
+type ForbidReservedVariantKeys<D> = [KnownReservedVariantKeys<D>] extends [
+  never,
+]
+  ? D
+  : never;
+
 declare const matchableUnion: unique symbol;
 
 /**
@@ -63,7 +80,8 @@ type MatchableBrand<U> = {
  * (enumerable variant names).
  *
  * Variant names `match`, `_tags`, `__proto__`, `prototype`, and
- * `constructor` are reserved and throw at creation time.
+ * `constructor` are reserved: they are a type error and throw at
+ * creation time.
  *
  * @example
  * ```ts
@@ -85,7 +103,7 @@ type MatchableBrand<U> = {
  * ```
  */
 export function createMatchable<const Defs extends Record<string, VariantCtor>>(
-  defs: Defs,
+  defs: ForbidReservedVariantKeys<Defs>,
 ) {
   type Variants = {
     [K in keyof Defs]: ReturnType<Defs[K]> & { tag: K & string };

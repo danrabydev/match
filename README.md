@@ -45,7 +45,7 @@ Takes a map of variant name → payload constructor. Returns:
 - **`match(value, arms)`** — exhaustive matcher bound to this union
 - **`_tags`** — `string[]` of variant names, in definition order
 
-`tag` is always the constructor name, even if the payload also has a `tag` field. It is non-writable and non-configurable so later assignment cannot reroute `match`. Names `match`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved.
+`tag` is always the constructor name, even if the payload also has a `tag` field. It is non-writable and non-configurable so later assignment cannot reroute `match`. Names `match`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved (type error and runtime throw). `__proto__` is rejected at runtime even when written via `Object.create(null)`.
 
 ### `match(value, arms)`
 

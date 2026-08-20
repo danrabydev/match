@@ -4,7 +4,6 @@ Priority order. Lower ID is higher priority.
 
 | ID | Priority | Item |
 | --- | --- | --- |
-| TD-03 | Medium | Reject reserved variant names at the type level |
 | TD-04 | Medium | Remove `as any` from constructor assignment |
 | TD-05 | Medium | Derive `_tags` from installed constructors |
 | TD-07 | Medium | Test the published `dist/` artifact |
@@ -13,12 +12,6 @@ Priority order. Lower ID is higher priority.
 | TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-11 | Low | Document payload-spread semantics |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
-
-## TD-03 — Reject reserved variant names at the type level
-
-`match`, `_tags`, `__proto__`, `prototype`, and `constructor` are rejected at runtime only. TypeScript still accepts `createMatchable({ match: () => ({}) })` until it throws.
-
-**Suggested fix:** Constrain `Defs` so those keys are a type error.
 
 ## TD-04 — Remove `as any` from constructor assignment
 
@@ -74,4 +67,5 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | --- | --- | --- |
 | TD-01 | Lock or freeze constructor `tag` | `tag` is defined last with `writable: false` and `configurable: false`. Payload fields stay mutable. |
 | TD-02 | Make `MatchableOf` inference robust | Phantom `MatchableBrand` on the namespace; `MatchableOf` no longer reads `match` parameters. |
+| TD-03 | Reject reserved variant names at the type level | Literal reserved keys make `createMatchable` a type error. Dynamic/`Record<string, …>` keys still throw at runtime (`__proto__`). |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |
