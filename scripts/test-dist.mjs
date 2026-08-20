@@ -1,8 +1,19 @@
+import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
-import { createMatchable as esmCreate, match as esmMatch } from "../dist/index.js";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const require = createRequire(import.meta.url);
-const cjs = require("../dist/index.cjs");
+const root = dirname(fileURLToPath(import.meta.url));
+const esmPath = join(root, "../dist/index.js");
+const cjsPath = join(root, "../dist/index.cjs");
+if (!existsSync(esmPath) || !existsSync(cjsPath)) {
+  throw new Error("dist missing; run pnpm build first");
+}
+
+const { createMatchable: esmCreate, match: esmMatch } = await import(
+  "../dist/index.js"
+);
+const cjs = createRequire(import.meta.url)("../dist/index.cjs");
 
 function assert(cond, message) {
   if (!cond) throw new Error(message);
