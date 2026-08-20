@@ -126,6 +126,11 @@ describe("reserved variant names", () => {
         constructor: () => ({}),
       }),
     ).toThrowError("reserved variant name: constructor");
+    expect(() =>
+      createMatchable({
+        prototype: () => ({}),
+      }),
+    ).toThrowError("reserved variant name: prototype");
   });
 });
 
