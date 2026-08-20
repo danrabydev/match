@@ -31,6 +31,25 @@ describe("createMatchable constructors", () => {
     expect(Status._tags).toEqual(["Idle", "Loading", "Success", "Error"]);
   });
 
+  it("copies enumerable own fields only (class methods are dropped)", () => {
+    class Box {
+      constructor(readonly n: number) {}
+      double() {
+        return this.n * 2;
+      }
+    }
+    const Boxed = createMatchable({
+      Value: (box: Box) => box,
+    });
+    const value = Boxed.Value(new Box(2));
+    expect(value.tag).toBe("Value");
+    expect(value.n).toBe(2);
+    expect(Object.getPrototypeOf(value)).toBe(Object.prototype);
+    expect(
+      Object.prototype.hasOwnProperty.call(value, "double"),
+    ).toBe(false);
+  });
+
   it("omits undefined constructor holes from _tags", () => {
     const Holes = createMatchable({
       Idle: () => ({}),

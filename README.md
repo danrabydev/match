@@ -47,6 +47,8 @@ Takes a map of variant name → payload constructor. Returns:
 
 `tag` is always the constructor name, even if the payload also has a `tag` field. It is non-writable and non-configurable so later assignment cannot reroute `match`. Names `match`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved (type error and runtime throw). `__proto__` is rejected at runtime even when written via `Object.create(null)`.
 
+Constructors should return **plain objects**. The library copies **enumerable own fields** only (`{ ...payload, tag }`). Class instances lose methods and the prototype; that is expected. Return `{ value }` (or another plain record), not `new SomeClass()`.
+
 ### `match(value, arms)`
 
 Standalone exhaustive matcher for any `{ tag: string }` union. Same runtime behavior as the bound `match` on a matchable namespace. Only own, callable arms are considered — a missing arm is never taken from `Object.prototype`.

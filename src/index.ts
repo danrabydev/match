@@ -89,6 +89,8 @@ type MatchableBrand<U> = {
  * Build a tagged-union namespace from payload constructors.
  *
  * Each key becomes a constructor that returns `{ ...payload, tag: key }`.
+ * Only enumerable own fields are copied — return a plain object, not a
+ * class instance (methods and the prototype are dropped).
  * The library-assigned `tag` is written last so payload fields cannot
  * forge the discriminant, then locked (`writable: false`,
  * `configurable: false`) so later assignment cannot reroute `match`.
