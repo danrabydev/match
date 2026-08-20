@@ -99,6 +99,46 @@ describe("discriminant integrity", () => {
       }),
     ).toBe("ada");
   });
+
+  it("locks tag so later assignment cannot reroute match", () => {
+    const value = Status.Idle();
+    expect(() => {
+      (value as { tag: string }).tag = "Success";
+    }).toThrow(TypeError);
+    expect(value.tag).toBe("Idle");
+    expect(
+      Status.match(value, {
+        Idle: () => "waiting",
+        Loading: () => "loading",
+        Success: () => "ok",
+        Error: () => "err",
+      }),
+    ).toBe("waiting");
+  });
+
+  it("rejects redefine or delete of the locked tag", () => {
+    const value = Status.Loading("fetching");
+    expect(
+      Object.getOwnPropertyDescriptor(value, "tag"),
+    ).toEqual({
+      value: "Loading",
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
+    expect(() => {
+      Object.defineProperty(value, "tag", { value: "Success" });
+    }).toThrow(TypeError);
+    expect(Reflect.deleteProperty(value, "tag")).toBe(false);
+    expect(value.tag).toBe("Loading");
+  });
+
+  it("still allows mutating non-tag payload fields", () => {
+    const value = Status.Loading("fetching");
+    value.msg = "still fetching";
+    expect(value.msg).toBe("still fetching");
+    expect(value.tag).toBe("Loading");
+  });
 });
 
 describe("reserved variant names", () => {

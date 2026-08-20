@@ -47,8 +47,10 @@ type VariantCtor = (...args: never[]) => object;
  *
  * Each key becomes a constructor that returns `{ ...payload, tag: key }`.
  * The library-assigned `tag` is written last so payload fields cannot
- * forge the discriminant. The returned object also has `match`
- * (exhaustive) and `_tags` (enumerable variant names).
+ * forge the discriminant, then locked (`writable: false`,
+ * `configurable: false`) so later assignment cannot reroute `match`.
+ * The returned object also has `match` (exhaustive) and `_tags`
+ * (enumerable variant names).
  *
  * Variant names `match`, `_tags`, `__proto__`, `prototype`, and
  * `constructor` are reserved and throw at creation time.
@@ -96,10 +98,18 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
       enumerable: true,
       configurable: true,
       writable: true,
-      value: ((...args: never[]) => ({
-        ...ctor(...args),
-        tag: key,
-      })) as any,
+      value: ((...args: never[]) => {
+        const payload = { ...ctor(...args) };
+        // Lock last so a payload `tag` cannot forge the discriminant,
+        // and later assignment cannot reroute `match`.
+        Object.defineProperty(payload, "tag", {
+          value: key,
+          enumerable: true,
+          writable: false,
+          configurable: false,
+        });
+        return payload;
+      }) as any,
     });
   }
 
