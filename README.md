@@ -4,6 +4,8 @@ Rust-style tagged unions and exhaustive `match` for TypeScript.
 
 Zero dependencies. Constructors for every variant, compile-time exhaustiveness, and enumerable tags at runtime.
 
+Building this repo requires **Node 22.18+** so tsdown can load `tsdown.config.ts` with native TypeScript stripping. `unrun` is not a direct dependency (tsdown may still list it as an optional peer in the lockfile). The published `dist/` is ES2022 and does not require that Node version.
+
 ## Installation
 
 ```bash
