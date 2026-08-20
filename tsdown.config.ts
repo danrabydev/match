@@ -6,4 +6,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   outDir: "dist",
+  // Dual package with "type": "module": ESM as .js/.d.ts, CJS as .cjs/.d.cts
+  fixedExtension: false,
+  platform: "neutral",
 });

@@ -53,6 +53,10 @@ Standalone exhaustive matcher for any `{ tag: string }` union. Same runtime beha
 
 Extracts the tagged-union type from a `createMatchable` result so you can write `type Status = MatchableOf<typeof Status>`.
 
+### `MatchArms<T, R>`
+
+The arm map type used by `match`: one function per `T["tag"]`, each receiving that variant’s payload.
+
 ## Why this pattern
 
 | Need | What you get |
