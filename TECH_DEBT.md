@@ -4,7 +4,6 @@ Priority order. Lower ID is higher priority.
 
 | ID | Priority | Item |
 | --- | --- | --- |
-| TD-01 | High | Lock or freeze constructor `tag` |
 | TD-02 | High | Make `MatchableOf` inference robust |
 | TD-03 | Medium | Reject reserved variant names at the type level |
 | TD-04 | Medium | Remove `as any` from constructor assignment |
@@ -15,12 +14,6 @@ Priority order. Lower ID is higher priority.
 | TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-11 | Low | Document payload-spread semantics |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
-
-## TD-01 — Lock or freeze constructor `tag`
-
-Constructed values are still mutable. `tag` is assigned last so payload fields cannot forge it at creation time, but nothing stops `value.tag = "Admin"` afterward from rerouting `match`.
-
-**Suggested fix:** `Object.defineProperty` with `writable: false`, or `Object.freeze` the variant.
 
 ## TD-02 — Make `MatchableOf` inference robust
 
@@ -86,4 +79,5 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 
 | ID | Item | Notes |
 | --- | --- | --- |
+| TD-01 | Lock or freeze constructor `tag` | `tag` is defined last with `writable: false` and `configurable: false`. Payload fields stay mutable. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |
