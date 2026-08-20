@@ -9,7 +9,6 @@ Priority order. Lower ID is higher priority.
 | TD-03 | Medium | Reject reserved variant names at the type level |
 | TD-04 | Medium | Remove `as any` from constructor assignment |
 | TD-05 | Medium | Derive `_tags` from installed constructors |
-| TD-06 | Medium | Add CI that runs typecheck, test, and build |
 | TD-07 | Medium | Test the published `dist/` artifact |
 | TD-08 | Low | Drop `unrun` on Node 22.18+ |
 | TD-09 | Low | Point `repository` / `homepage` at the public host |
@@ -47,12 +46,6 @@ The `createMatchable` loop casts constructors `as any` because TypeScript cannot
 
 **Suggested fix:** Record keys that actually received a constructor, or skip `undefined` entries in both the constructor map and `_tags`.
 
-## TD-06 — Add CI that runs typecheck, test, and build
-
-No ESLint/Biome, Changesets, or CI. `prepublishOnly` is the only gate, and it only runs on the machine that publishes.
-
-**Suggested fix:** Origin/GitHub Actions (or equivalent) running `pnpm typecheck && pnpm test && pnpm build` on every PR. Linters and Changesets can wait until they are needed.
-
 ## TD-07 — Test the published `dist/` artifact
 
 Vitest imports `src/`, not `dist/`. Dual-package ESM/CJS output was smoke-tested by hand.
@@ -88,3 +81,9 @@ Payload spread copies enumerable own fields only. Class instances lose methods a
 Exhaustiveness is the point of this library. A Rust-style `_` default arm would be a new feature, not a bug fix.
 
 **Suggested fix:** Only if a non-exhaustive escape hatch is explicitly wanted.
+
+## Completed
+
+| ID | Item | Notes |
+| --- | --- | --- |
+| TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |
