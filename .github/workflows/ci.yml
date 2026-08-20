@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 22 = Maintenance LTS (oldest we run). 24 = Active LTS.
+        # 22.18+ required (native TS stripping; no unrun). 24 = Active LTS.
         # Drop 22 only at EOL (2027-04-30). Add 26 after it becomes Active LTS.
         node: [22, 24]
     steps:

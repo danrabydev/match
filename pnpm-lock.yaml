@@ -17,9 +17,6 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
-      unrun:
-        specifier: ^0.3.1
-        version: 0.3.1
       vitest:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@26.2.0)(vite@8.2.1(@types/node@26.2.0))
@@ -1101,6 +1098,7 @@ snapshots:
   unrun@0.3.1:
     dependencies:
       rolldown: 1.2.5
+    optional: true
 
   verkit@0.3.2: {}
 
