@@ -4,7 +4,6 @@ Priority order. Lower ID is higher priority.
 
 | ID | Priority | Item |
 | --- | --- | --- |
-| TD-02 | High | Make `MatchableOf` inference robust |
 | TD-03 | Medium | Reject reserved variant names at the type level |
 | TD-04 | Medium | Remove `as any` from constructor assignment |
 | TD-05 | Medium | Derive `_tags` from installed constructors |
@@ -14,12 +13,6 @@ Priority order. Lower ID is higher priority.
 | TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-11 | Low | Document payload-spread semantics |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
-
-## TD-02 — Make `MatchableOf` inference robust
-
-`MatchableOf` infers the union through `match: (value: infer V, arms: never) => …`. That works with the current signature and will break if `match` grows another parameter.
-
-**Suggested fix:** Infer from a dedicated, stable type exported by `createMatchable` (for example a phantom `__union` field) instead of `Parameters` of `match`.
 
 ## TD-03 — Reject reserved variant names at the type level
 
@@ -80,4 +73,5 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | ID | Item | Notes |
 | --- | --- | --- |
 | TD-01 | Lock or freeze constructor `tag` | `tag` is defined last with `writable: false` and `configurable: false`. Payload fields stay mutable. |
+| TD-02 | Make `MatchableOf` inference robust | Phantom `MatchableBrand` on the namespace; `MatchableOf` no longer reads `match` parameters. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |

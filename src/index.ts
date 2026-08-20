@@ -42,6 +42,16 @@ export function match<T extends { tag: string }, R>(
 
 type VariantCtor = (...args: never[]) => object;
 
+declare const matchableUnion: unique symbol;
+
+/**
+ * Phantom brand carrying the tagged-union type of a `createMatchable`
+ * namespace. Stable under `match` signature changes; used by `MatchableOf`.
+ */
+type MatchableBrand<U> = {
+  readonly [matchableUnion]: [U];
+};
+
 /**
  * Build a tagged-union namespace from payload constructors.
  *
@@ -113,16 +123,20 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
     });
   }
 
-  return {
+  const namespace = {
     ...constructors,
     match: <R>(value: Union, arms: MatchArms<Union, R>): R =>
       match(value, arms),
     _tags: Object.keys(defs) as (keyof Defs & string)[],
   };
+  return namespace as typeof namespace & MatchableBrand<Union>;
 }
 
 /**
  * Extract the tagged-union type from a `createMatchable` namespace.
+ *
+ * Infers from a phantom brand on the namespace, not from `match`'s
+ * parameter list, so adding arguments to `match` cannot break this.
  *
  * @example
  * ```ts
@@ -131,7 +145,7 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
  * ```
  */
 export type MatchableOf<T> = T extends {
-  match: (value: infer V, arms: never) => unknown;
+  readonly [matchableUnion]: [infer U];
 }
-  ? V
+  ? U
   : never;

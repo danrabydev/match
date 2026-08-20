@@ -210,6 +210,20 @@ describe("type-level exhaustiveness", () => {
       | { tag: "Success"; data: number }
       | { tag: "Error"; err: Error }
     >();
+    expectTypeOf<MatchableOf<typeof Status>>().toEqualTypeOf<Status>();
+  });
+
+  it("MatchableOf stays the union if match gains a leading parameter", () => {
+    type WithLeadingMatchParam = typeof Status & {
+      match: (
+        ctx: { debug: true },
+        value: Status,
+        arms: never,
+      ) => unknown;
+    };
+    expectTypeOf<
+      MatchableOf<WithLeadingMatchParam>
+    >().toEqualTypeOf<Status>();
   });
 
   it("requires every variant arm (enforced by tsc)", () => {
