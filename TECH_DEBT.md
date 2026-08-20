@@ -5,7 +5,6 @@ Priority order. Lower ID is higher priority.
 | ID | Priority | Item |
 | --- | --- | --- |
 | TD-09 | Low | Point `repository` / `homepage` at the public host |
-| TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
 
 ## TD-09 — Point `repository` / `homepage` at the public host
@@ -13,12 +12,6 @@ Priority order. Lower ID is higher priority.
 `package.json` currently points at Origin. Fine until the package is published to npm or mirrored to GitHub.
 
 **Suggested fix:** Update `repository`, `homepage`, and `bugs` when the public URL is known.
-
-## TD-10 — Add publint / Are The Types Wrong / npm provenance
-
-No dual-package lint, types-export check, or provenance on publish.
-
-**Suggested fix:** Optional tsdown peers (`publint`, `@arethetypeswrong/core`) in `prepublishOnly`, plus npm provenance when publishing.
 
 ## TD-12 — Wildcard `_` arm (feature, not a fix)
 
@@ -37,5 +30,6 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | TD-05 | Derive `_tags` from installed constructors | `_tags` records keys that received a constructor; `undefined` holes are omitted. |
 | TD-07 | Test the published `dist/` artifact | `scripts/test-dist.mjs` imports ESM and requires CJS after `pnpm build`; wired into `check` and CI. |
 | TD-08 | Drop `unrun` on Node 22.18+ | Removed the `unrun` direct dep. Dev/CI use Node 22.18+; published `dist/` stays `es2022` (no consumer `engines` pin). |
+| TD-10 | Add publint / Are The Types Wrong / npm provenance | `pnpm lint:package` runs publint + attw after build; `publish:npm` uses `--provenance`. |
 | TD-11 | Document payload-spread semantics | README and JSDoc: constructors should return plain objects; only enumerable own fields are copied. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |

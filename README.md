@@ -73,6 +73,16 @@ The arm map type used by `match`: one function per `T["tag"]`, each receiving th
 
 This is the TypeScript analogue of a Rust `enum` plus `match`: a closed set of tagged values, constructed in one place, destructured exhaustively everywhere else.
 
+## Publishing
+
+`pnpm check` typechecks, tests, builds, smoke-tests `dist/`, then runs [publint](https://publint.dev/) and [Are The Types Wrong](https://arethetypeswrong.github.io/). Publish with provenance:
+
+```bash
+pnpm publish:npm
+```
+
+(`npm publish --access public --provenance`. Requires a trusted publisher / OIDC environment such as GitHub Actions.)
+
 ## License
 
 MIT

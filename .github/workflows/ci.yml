@@ -60,3 +60,6 @@ jobs:
 
       - name: Smoke-test published dist
         run: pnpm test:dist
+
+      - name: Lint package exports
+        run: pnpm lint:package
