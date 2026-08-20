@@ -93,7 +93,8 @@ type MatchableBrand<U> = {
  * forge the discriminant, then locked (`writable: false`,
  * `configurable: false`) so later assignment cannot reroute `match`.
  * The returned object also has `match` (exhaustive) and `_tags`
- * (enumerable variant names).
+ * (enumerable names of constructors that were actually installed;
+ * `undefined` holes are omitted).
  *
  * Variant names `match`, `_tags`, `__proto__`, `prototype`, and
  * `constructor` are reserved: they are a type error and throw at
@@ -131,6 +132,7 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
       ...args: Parameters<Defs[K]>
     ) => ReturnType<Defs[K]> & { tag: K & string };
   };
+  const tags: (keyof Defs & string)[] = [];
 
   for (const key of Object.keys(defs) as (keyof Defs)[]) {
     if (RESERVED_VARIANT_NAMES.has(key as string)) {
@@ -138,11 +140,13 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
     }
     const ctor = defs[key];
     if (ctor === undefined) continue;
-    Object.defineProperty(constructors, key, {
+    const name = key as keyof Defs & string;
+    tags.push(name);
+    Object.defineProperty(constructors, name, {
       enumerable: true,
       configurable: true,
       writable: true,
-      value: bindVariantCtor(key as keyof Defs & string, ctor),
+      value: bindVariantCtor(name, ctor),
     });
   }
 
@@ -150,7 +154,7 @@ export function createMatchable<const Defs extends Record<string, VariantCtor>>(
     ...constructors,
     match: <R>(value: Union, arms: MatchArms<Union, R>): R =>
       match(value, arms),
-    _tags: Object.keys(defs) as (keyof Defs & string)[],
+    _tags: tags,
   };
   return namespace as typeof namespace & MatchableBrand<Union>;
 }

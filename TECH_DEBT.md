@@ -4,19 +4,12 @@ Priority order. Lower ID is higher priority.
 
 | ID | Priority | Item |
 | --- | --- | --- |
-| TD-05 | Medium | Derive `_tags` from installed constructors |
 | TD-07 | Medium | Test the published `dist/` artifact |
 | TD-08 | Low | Drop `unrun` on Node 22.18+ |
 | TD-09 | Low | Point `repository` / `homepage` at the public host |
 | TD-10 | Low | Add publint / Are The Types Wrong / npm provenance |
 | TD-11 | Low | Document payload-spread semantics |
 | TD-12 | Low | Wildcard `_` arm (feature, not a fix) |
-
-## TD-05 — Derive `_tags` from installed constructors
-
-`_tags` is `Object.keys(defs)`. A hole like `{ Idle: undefined }` still lists `Idle` with no constructor.
-
-**Suggested fix:** Record keys that actually received a constructor, or skip `undefined` entries in both the constructor map and `_tags`.
 
 ## TD-07 — Test the published `dist/` artifact
 
@@ -62,4 +55,5 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | TD-02 | Make `MatchableOf` inference robust | Phantom `MatchableBrand` on the namespace; `MatchableOf` no longer reads `match` parameters. |
 | TD-03 | Reject reserved variant names at the type level | Literal reserved keys make `createMatchable` a type error. Dynamic/`Record<string, …>` keys still throw at runtime (`__proto__`). |
 | TD-04 | Remove `as any` from constructor assignment | `bindVariantCtor` types each constructor; loop no longer uses `as any`. |
+| TD-05 | Derive `_tags` from installed constructors | `_tags` records keys that received a constructor; `undefined` holes are omitted. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |
