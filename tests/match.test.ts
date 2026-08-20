@@ -142,16 +142,35 @@ describe("discriminant integrity", () => {
 });
 
 describe("reserved variant names", () => {
+  it("rejects reserved names at the type level", () => {
+    expect(() =>
+      // @ts-expect-error reserved variant name
+      createMatchable({ match: () => ({}) }),
+    ).toThrowError("reserved variant name: match");
+    expect(() =>
+      // @ts-expect-error reserved variant name
+      createMatchable({ _tags: () => ({}) }),
+    ).toThrowError("reserved variant name: _tags");
+    expect(() =>
+      // @ts-expect-error reserved variant name
+      createMatchable({ constructor: () => ({}) }),
+    ).toThrowError("reserved variant name: constructor");
+    expect(() =>
+      // @ts-expect-error reserved variant name
+      createMatchable({ prototype: () => ({}) }),
+    ).toThrowError("reserved variant name: prototype");
+  });
+
   it("rejects match and _tags as variant names", () => {
     expect(() =>
       createMatchable({
         match: () => ({}),
-      }),
+      } as never),
     ).toThrowError("reserved variant name: match");
     expect(() =>
       createMatchable({
         _tags: () => ({}),
-      }),
+      } as never),
     ).toThrowError("reserved variant name: _tags");
   });
 
@@ -164,12 +183,12 @@ describe("reserved variant names", () => {
     expect(() =>
       createMatchable({
         constructor: () => ({}),
-      }),
+      } as never),
     ).toThrowError("reserved variant name: constructor");
     expect(() =>
       createMatchable({
         prototype: () => ({}),
-      }),
+      } as never),
     ).toThrowError("reserved variant name: prototype");
   });
 });
