@@ -47,9 +47,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://origin.cursor.com/git/danrabydev/match.git"
+    "url": "git+https://github.com/danrabydev/match.git"
   },
-  "homepage": "https://origin.cursor.com/git/danrabydev/match",
+  "homepage": "https://github.com/danrabydev/match",
+  "bugs": {
+    "url": "https://github.com/danrabydev/match/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
