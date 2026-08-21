@@ -6,6 +6,7 @@
  */
 import {
   createMatchable,
+  peeker,
   type MatchableOf,
   type TagMismatch,
 } from "../src/index.js";
@@ -38,21 +39,27 @@ const posts: Record<string, Post> = {
 
 const cachedAt = new Date("2026-01-01T00:00:00.000Z");
 
-export function getUser(id: string): ApiResult<User, ApiError> {
+type ApiNs = typeof ApiResult;
+
+function loadUser(ns: ApiNs, id: string): ApiResult<User, ApiError> {
   if (id === "cached") {
-    return ApiResult.Cached(cachedAt);
+    return ns.Cached(cachedAt);
   }
   if (id === "loading") {
-    return ApiResult.Loading("fetching user");
+    return ns.Loading("fetching user");
   }
   const found = users[id];
   if (found === undefined) {
-    return ApiResult.Error({
+    return ns.Error({
       code: 404,
       message: "user not found",
     });
   }
-  return ApiResult.Success(found);
+  return ns.Success(found);
+}
+
+export function getUser(id: string): ApiResult<User, ApiError> {
+  return loadUser(ApiResult, id);
 }
 
 export function getPost(id: string): ApiResult<Post, ApiError> {
@@ -107,6 +114,29 @@ function isTagMismatch(err: unknown): err is TagMismatch {
     "reason" in err &&
     err.reason === "tag-mismatch"
   );
+}
+
+export const apiMessages: string[] = [];
+
+export const interceptErrors = peeker("api.errors", {
+  Error: (v: Readonly<{ tag: "Error"; err: unknown }>) => {
+    const err = v.err as ApiError;
+    apiMessages.push(`${err.code}: ${err.message}`);
+  },
+});
+
+/** Consumer that constructs through a diag-bound namespace, then peeks Error. */
+export class Api {
+  private readonly ns = ApiResult.withDiagnostics({
+    enabled: true,
+    branches: ["Error"],
+  });
+
+  getUser(id: string): ApiResult<User, ApiError> {
+    const result = loadUser(this.ns, id);
+    this.ns.peek(result, interceptErrors);
+    return result;
+  }
 }
 
 export function handlePage(

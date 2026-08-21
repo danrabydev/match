@@ -1,6 +1,8 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import {
+  Api,
   ApiResult,
+  apiMessages,
   getPost,
   getUser,
   handlePage,
@@ -16,11 +18,13 @@ import {
   Boxed,
   constructorsExample,
   boundMatchExample,
+  diagnosticsExample,
   genericAliasExample,
   lockedTagExample,
   matchArmsExample,
   monomorphicUnion,
   narrowVsWideExample,
+  peekExample,
   plainObjectCopyExample,
   standaloneMatchExample,
   Status,
@@ -68,6 +72,17 @@ describe("examples/api-client", () => {
     expect(handlePage(loadPage("loading", "9"))).toBe(
       "mismatch: Loading,Success",
     );
+  });
+
+  it("imposes Error peekers from an Api consumer", () => {
+    apiMessages.length = 0;
+    const api = new Api();
+    const missing = api.getUser("missing");
+    expect(apiMessages).toEqual(["404: user not found"]);
+    expect(handleUser(missing)).toBe("404: user not found");
+    apiMessages.length = 0;
+    expect(handleUser(api.getUser("1"))).toBe("ada");
+    expect(apiMessages).toEqual([]);
   });
 });
 
@@ -154,5 +169,24 @@ describe("examples/catalog", () => {
     const { ok, mismatch } = mergeExample();
     expect(ok).toEqual({ tag: "Success", data: [1, 2] });
     expect(mismatch.tag).toBe("Error");
+  });
+
+  it("16. peek is identity and match still returns one R", () => {
+    expect(peekExample()).toEqual({ same: true, result: "err" });
+  });
+
+  it("17. diagnostics records peek then match on an enabled Error", () => {
+    const trail = diagnosticsExample();
+    expect(trail[0]).toMatchObject({
+      kind: "peek",
+      peeker: "logErrors",
+      tag: "Error",
+      hit: true,
+    });
+    expect(trail[1]).toMatchObject({
+      kind: "match",
+      tag: "Error",
+      peekers: ["logErrors"],
+    });
   });
 });

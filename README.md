@@ -1,5 +1,7 @@
 # @danrabydev/match
 
+[![Socket Badge](https://badge.socket.dev/npm/package/@danrabydev/match/0.3.0)](https://badge.socket.dev/npm/package/@danrabydev/match/0.3.0)
+
 Rust-style tagged unions and exhaustive `match` for TypeScript.
 
 Zero dependencies. Constructors for every variant, compile-time exhaustiveness, and enumerable tags at runtime.
@@ -71,10 +73,12 @@ Takes a map of variant name → payload constructor. Returns:
 
 - **constructors** for each key (`Status.Loading("fetching")` → `{ tag: "Loading", msg: "fetching" }`)
 - **`match(value, arms)`** — exhaustive matcher bound to this union
+- **`peek(value, arms)`** — optional void observers; returns the same value
+- **`withDiagnostics(opts)`** — bind a diag mask (and optional reporters) at init
 - **`merge(...results)`** — zip same-tag results; mixed tags become `Error` (`TagMismatch`)
 - **`_tags`** — `string[]` of installed variant names, in definition order (`undefined` constructor holes are omitted)
 
-`tag` is always the constructor name, even if the payload also has a `tag` field. It is non-writable and non-configurable so later assignment cannot reroute `match`. Names `match`, `merge`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved (type error and runtime throw). `__proto__` is rejected at runtime even when written via `Object.create(null)`.
+`tag` is always the constructor name, even if the payload also has a `tag` field. It is non-writable and non-configurable so later assignment cannot reroute `match`. Names `match`, `merge`, `peek`, `withDiagnostics`, `_tags`, `__proto__`, `prototype`, and `constructor` are reserved (type error and runtime throw). `__proto__` is rejected at runtime even when written via `Object.create(null)`.
 
 Constructors should return **plain objects**. The library copies **enumerable own fields** only (`{ ...payload, tag }`). Class instances lose methods and the prototype; that is expected. Return `{ value }` (or another plain record), not `new SomeClass()`.
 
@@ -83,6 +87,50 @@ Constructors should return **plain objects**. The library copies **enumerable ow
 Standalone exhaustive matcher for any `{ tag: string }` union. Same runtime behavior as the bound `match` on a matchable namespace. The value’s type is inferred from the first argument, so `match(result: ApiResult<User>, …)` types `data` as `User`. Bound `Ns.match` allows extra arms for tags not present on a narrowed value; standalone `match` does not. A variable typed as the full union still requires every arm.
 
 Only own, callable arms are considered — a missing arm is never taken from `Object.prototype`.
+
+### `peek(value, arms)` / `Ns.peek(value, arms)`
+
+Optional observers. Write only the tags you care about; omitted tags are no-ops. Arms return `void` (a toast id or other incidental return is ignored). `peek` returns the **same object** (`===`), so reusable peekers can be imposed and `match` still performs one `R`:
+
+```ts
+const logErrors = peeker("logErrors", {
+  Error: ({ err }) => console.error(err),
+});
+
+ApiResult.peek(result, logErrors);
+return ApiResult.match(result, {
+  Idle: () => "",
+  Loading: ({ msg }) => msg,
+  Success: ({ data }) => data.name,
+  Error: () => "",
+  Cached: ({ at }) => at.toISOString(),
+});
+```
+
+This is not a pipe. Peek does not consume the value and does not return branch results. Bound `Ns.peek` allows extra arms for tags not on a narrowed value; standalone `peek` does not.
+
+### `diagnostics` / `withDiagnostics` / `enableDiagnostics`
+
+A **mask**, not a required logger. `{ enabled, branches? }` chooses whether this instance (or client) records a trail, and for which tags.
+
+```ts
+ApiResult.Success(user); // hot path
+ApiResult.Error(err, diagnostics({ enabled: true, branches: ["Error"] }));
+
+const Ns = ApiResult.withDiagnostics({
+  enabled: true,
+  branches: ["Error"],
+});
+Ns.Success(user); // silent (tag not in branches)
+const failed = Ns.Error(err);
+Ns.peek(failed, logErrors);
+Ns.match(failed, { /* … */ });
+peekTrace(failed); // trail on the tagged value
+```
+
+`onPeek` / `onMatch` on `withDiagnostics` are optional. Without them, events still record for `peekTrace(value)`.
+
+`enableDiagnostics(["Panic", "Crit"])` is a process-wide floor: those tags always `console.error`, even if the instance mask is `{ enabled: false }`. Do not put `Success` on the floor. `disableDiagnostics()` clears it (tests).
 
 ### `MatchableOf<T, Data?, Err?>`
 

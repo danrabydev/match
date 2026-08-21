@@ -14,6 +14,9 @@ const {
   createMatchable: esmCreate,
   match: esmMatch,
   merge: esmMerge,
+  peek: esmPeek,
+  diagnostics: esmDiagnostics,
+  peekTrace: esmPeekTrace,
 } = await import("../dist/index.js");
 const cjs = createRequire(import.meta.url)("../dist/index.cjs");
 
@@ -25,6 +28,8 @@ function smoke(api, label) {
   assert(typeof api.createMatchable === "function", `${label}: createMatchable`);
   assert(typeof api.match === "function", `${label}: match`);
   assert(typeof api.merge === "function", `${label}: merge`);
+  assert(typeof api.peek === "function", `${label}: peek`);
+  assert(typeof api.diagnostics === "function", `${label}: diagnostics`);
 
   const Status = api.createMatchable({
     Idle: () => ({}),
@@ -62,10 +67,30 @@ function smoke(api, label) {
   const boundMerge = Status.merge(Status.Ready(1), Status.Idle());
   assert(boundMerge.tag === "Error", `${label}: merge mismatch`);
   assert(boundMerge.err.reason === "tag-mismatch", `${label}: TagMismatch`);
+
+  const peeked = Status.peek(value, { Ready: () => {} });
+  assert(peeked === value, `${label}: peek identity`);
+  const viaStandalonePeek = api.peek(value, { Ready: () => {} });
+  assert(viaStandalonePeek === value, `${label}: standalone peek`);
+
+  const traced = Status.Error("x", api.diagnostics({ enabled: true }));
+  Status.peek(traced, { Error: () => {} });
+  const trail = api.peekTrace(traced);
+  assert(trail.length === 1, `${label}: peekTrace`);
+  assert(trail[0].kind === "peek", `${label}: peekTrace kind`);
+  assert(!("enabled" in traced), `${label}: diag not in payload`);
+  assert(typeof Status.withDiagnostics === "function", `${label}: withDiagnostics`);
 }
 
 smoke(
-  { createMatchable: esmCreate, match: esmMatch, merge: esmMerge },
+  {
+    createMatchable: esmCreate,
+    match: esmMatch,
+    merge: esmMerge,
+    peek: esmPeek,
+    diagnostics: esmDiagnostics,
+    peekTrace: esmPeekTrace,
+  },
   "esm",
 );
 smoke(cjs, "cjs");

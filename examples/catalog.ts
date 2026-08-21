@@ -6,7 +6,10 @@
  */
 import {
   createMatchable,
+  diagnostics,
   match,
+  peeker,
+  peekTrace,
   type MatchableOf,
   type MatchArms,
 } from "../src/index.js";
@@ -245,4 +248,46 @@ export function mergeExample() {
   const ok = Status.merge(Status.Success(1), Status.Success(2));
   const mismatch = Status.merge(Status.Success(1), Status.Loading("x"));
   return { ok, mismatch };
+}
+
+// ---------------------------------------------------------------------------
+// 16. peek — optional void observers; match still returns one R
+// ---------------------------------------------------------------------------
+
+export const logErrors = peeker("logErrors", {
+  Error: ({ err }: { err: Error }) => {
+    void err;
+  },
+});
+
+export function peekExample() {
+  const value = Status.Error(new Error("nope"));
+  Status.peek(value, logErrors);
+  Status.peek(value, { Loading: () => {} });
+  const result = Status.match(value, {
+    Idle: () => "waiting",
+    Loading: () => "loading",
+    Success: () => "ok",
+    Error: () => "err",
+  });
+  return { same: Status.peek(value, {}) === value, result };
+}
+
+// ---------------------------------------------------------------------------
+// 17. diagnostics — mask on the instance; trail is pull-based
+// ---------------------------------------------------------------------------
+
+export function diagnosticsExample() {
+  const value = Status.Error(
+    new Error("nope"),
+    diagnostics({ enabled: true, branches: ["Error"] }),
+  );
+  Status.peek(value, logErrors);
+  Status.match(value, {
+    Idle: () => "waiting",
+    Loading: () => "loading",
+    Success: () => "ok",
+    Error: () => "err",
+  });
+  return peekTrace(value);
 }

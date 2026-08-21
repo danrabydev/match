@@ -20,3 +20,5 @@ Runnable, typechecked catalog of every `@danrabydev/match` feature. `pnpm test` 
 | 13. Payload `extends` constraint | [`catalog.ts`](./catalog.ts) §13 |
 | 14. Throwing arms | [`catalog.ts`](./catalog.ts) §14 |
 | 15. `merge` same-tag zip / mismatch Error | [`catalog.ts`](./catalog.ts) §15 ; [`api-client.ts`](./api-client.ts) `loadPage` |
+| 16. `peek` optional observers | [`catalog.ts`](./catalog.ts) §16 ; [`api-client.ts`](./api-client.ts) `Api` |
+| 17. diagnostics mask / trail | [`catalog.ts`](./catalog.ts) §17 |

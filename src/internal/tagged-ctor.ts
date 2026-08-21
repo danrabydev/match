@@ -1,4 +1,9 @@
 import {
+  attachDiag,
+  isDiagnostics,
+  type BrandedDiag,
+} from "../diagnostics.js";
+import {
   type IsUnknown,
   type Prettify,
   type SameType,
@@ -13,15 +18,20 @@ type ReplaceMatching<R, From, To> = {
     : R[P];
 };
 
+type DiagParam = BrandedDiag;
+
 type TaggedCtorFromArgs<K extends string, A extends unknown[], R> = A extends []
-  ? () => Prettify<R & { tag: K }>
+  ? (diag?: DiagParam) => Prettify<R & { tag: K }>
   : A extends [infer _Arg, infer _Next, ...infer _Rest]
-    ? (...args: A) => Prettify<R & { tag: K }>
+    ? (...args: [...A, diag?: DiagParam]) => Prettify<R & { tag: K }>
     : A extends [infer Arg]
       ? IsUnknown<Arg> extends true
-        ? <T>(arg: T) => Prettify<ReplaceMatching<R, unknown, T> & { tag: K }>
-        : (arg: Arg) => Prettify<R & { tag: K }>
-      : (...args: A) => Prettify<R & { tag: K }>;
+        ? <T>(
+            arg: T,
+            diag?: DiagParam,
+          ) => Prettify<ReplaceMatching<R, unknown, T> & { tag: K }>
+        : (arg: Arg, diag?: DiagParam) => Prettify<R & { tag: K }>
+      : (...args: [...A, diag?: DiagParam]) => Prettify<R & { tag: K }>;
 
 export type TaggedCtor<K extends string, F> = F extends (
   ...args: infer A
@@ -48,8 +58,19 @@ export function bindVariantCtor<K extends string, F extends VariantCtor>(
   key: K,
   ctor: F,
 ): TaggedCtor<K, F> {
-  return ((...args: Parameters<F>) => {
+  return ((...args: unknown[]) => {
+    let mask: BrandedDiag | undefined;
+    if (args.length > 0 && isDiagnostics(args[args.length - 1])) {
+      mask = args.pop() as BrandedDiag;
+    }
     const payload = { ...ctor(...(args as never[])) };
-    return lockTag(payload, key);
+    const value = lockTag(payload, key);
+    if (mask !== undefined) {
+      attachDiag(value, {
+        enabled: mask.enabled,
+        ...(mask.branches === undefined ? {} : { branches: mask.branches }),
+      });
+    }
+    return value;
   }) as unknown as TaggedCtor<K, F>;
 }

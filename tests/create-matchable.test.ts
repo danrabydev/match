@@ -136,6 +136,14 @@ describe("reserved variant names", () => {
     ).toThrowError("reserved variant name: constructor");
     expect(() =>
       // @ts-expect-error reserved variant name
+      createMatchable({ peek: () => ({}) }),
+    ).toThrowError("reserved variant name: peek");
+    expect(() =>
+      // @ts-expect-error reserved variant name
+      createMatchable({ withDiagnostics: () => ({}) }),
+    ).toThrowError("reserved variant name: withDiagnostics");
+    expect(() =>
+      // @ts-expect-error reserved variant name
       createMatchable({ prototype: () => ({}) }),
     ).toThrowError("reserved variant name: prototype");
   });
@@ -151,6 +159,16 @@ describe("reserved variant names", () => {
         _tags: () => ({}),
       } as never),
     ).toThrowError("reserved variant name: _tags");
+    expect(() =>
+      createMatchable({
+        peek: () => ({}),
+      } as never),
+    ).toThrowError("reserved variant name: peek");
+    expect(() =>
+      createMatchable({
+        withDiagnostics: () => ({}),
+      } as never),
+    ).toThrowError("reserved variant name: withDiagnostics");
   });
 
   it("rejects prototype-polluting variant names", () => {

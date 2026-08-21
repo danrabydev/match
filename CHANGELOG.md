@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- **`peek` / `Ns.peek`** — optional void observers on a tagged value. Returns the same object (`===`). Omitted arms are no-ops. `match` is still the only exhaustive, value-returning actor.
+- **`peeker(name, arms)`** — name a reusable peek map for diagnostics.
+- **Diagnostics** — `diagnostics({ enabled, branches? })` as a branded last constructor argument; `Ns.withDiagnostics(opts)` at client init; `enableDiagnostics(["Panic", "Crit"])` as a process-wide floor. `onPeek` / `onMatch` are optional. `peekTrace(value)` pulls the trail. `peek` and `withDiagnostics` are reserved variant names.
+
 ## 0.2.0
 
 First feature release after `0.1.0`.

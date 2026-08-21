@@ -1,3 +1,5 @@
+import { emitMatch } from "./diagnostics.js";
+
 /**
  * Exhaustive handler map for a tagged union `T`, producing `R`.
  *
@@ -47,5 +49,7 @@ export function match<T, R>(
   if (typeof arm !== "function") {
     throw new Error(`unhandled variant: ${String(tag)}`);
   }
-  return (arm as (payload: T) => R)(value);
+  const result = (arm as (payload: T) => R)(value);
+  emitMatch(tagged);
+  return result;
 }
