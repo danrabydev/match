@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+- Package metadata: `repository` / `bugs` → GitHub; `homepage` → `https://danraby.dev/publish/match`.
+- GitHub Actions `publish.yml` publishes to npm on pushes to `main` (Trusted Publishing / provenance).
+
 ## 0.3.0
 
 - **`peek` / `Ns.peek`** — optional void observers on a tagged value. Returns the same object (`===`). Omitted arms are no-ops. `match` is still the only exhaustive, value-returning actor.

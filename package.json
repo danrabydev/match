@@ -1,6 +1,6 @@
 {
   "name": "@danrabydev/match",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Rust-style tagged unions and exhaustive match for TypeScript",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -47,9 +47,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://origin.cursor.com/git/danrabydev/match.git"
+    "url": "git+https://github.com/danrabydev/match.git"
   },
-  "homepage": "https://origin.cursor.com/git/danrabydev/match",
+  "homepage": "https://danraby.dev/publish/match",
+  "bugs": {
+    "url": "https://github.com/danrabydev/match/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
