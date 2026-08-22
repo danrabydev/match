@@ -1,6 +1,6 @@
 {
   "name": "@danrabydev/match",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Rust-style tagged unions and exhaustive match for TypeScript",
   "type": "module",
   "main": "./dist/index.cjs",
