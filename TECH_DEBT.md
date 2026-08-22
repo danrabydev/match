@@ -26,4 +26,4 @@ Exhaustiveness is the point of this library. A Rust-style `_` default arm would 
 | TD-10 | Add publint / Are The Types Wrong / npm provenance | `pnpm lint:package` runs publint + attw after build; `publish:npm` uses `--provenance`. |
 | TD-11 | Document payload-spread semantics | README and JSDoc: constructors should return plain objects; only enumerable own fields are copied. |
 | TD-06 | Add CI that runs typecheck, test, and build | `.github/workflows/ci.yml` runs `pnpm typecheck`, `pnpm test`, and `pnpm build` on `main` and every PR. Connect Depot or Buildkite on the Origin Apps tab so the workflow actually executes. |
-| TD-09 | Point `repository` / `homepage` at the public host | `package.json` `repository`, `homepage`, and `bugs` now point at `https://github.com/danrabydev/match`. |
+| TD-09 | Point `repository` / `homepage` at the public host | `repository` / `bugs` → GitHub; `homepage` → `https://danraby.dev/publish/match`. |
