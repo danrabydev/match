@@ -2,7 +2,15 @@
 
 Read this before changing code. Shared source of truth: https://github.com/danrabydev/agent-notes/blob/main/common/coding-standards.md
 
-Cyber then QA before merge. No secrets in git, docs examples, or command/args.
+QA then Cyber before merge. No secrets in git, docs examples, or command/args.
+
+## Planning / Board
+
+- Use one board only: [All work](https://github.com/users/danrabydev/projects/8), filtered by Group. Every item lives on All work.
+- GitHub Projects 2–6 are gone. Do not link or use them as planning boards.
+- Follow this status path in order: Todo → Need info → Implementation → Code review → QA → Cyber → Ready for release → Released.
+- QA comes before Cyber. A QA fix must go through security review and must not skip Cyber.
+- Groom weekly before anyone builds.
 
 ## Updates
 
